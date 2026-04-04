@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.database import AsyncSessionLocal
 from app.core.security import decode_token
-from app.models.expense import Expense
+from app.models.expense import Expense, TransactionType
 from app.schemas.expense import ExpenseCreate, ExpenseResponse
 from fastapi.security import OAuth2PasswordBearer
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -36,10 +36,25 @@ async def create_expense(
 
 @router.get("/", response_model=List[ExpenseResponse])
 async def get_expenses(
+    category_id: Optional[int] = None,
+    type: Optional[TransactionType] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
 ):
-    result = await db.execute(select(Expense).where(Expense.user_id == user_id))
+    query = select(Expense).where(Expense.user_id == user_id)
+    
+    if category_id:
+        query = query.where(Expense.category_id == category_id)
+    if type:
+        query = query.where(Expense.type == type)
+    if start_date:
+        query = query.where(Expense.date >= start_date)
+    if end_date:
+        query = query.where(Expense.date <= end_date)
+    
+    result = await db.execute(query)
     return result.scalars().all()
 
 @router.delete("/{expense_id}")
