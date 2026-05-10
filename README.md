@@ -2,11 +2,6 @@
 
 REST API untuk manajemen keuangan pribadi — tracking pemasukan, pengeluaran, budget, dan laporan bulanan.
 
-## 🚀 Live Demo
-**Base URL:** https://fintrack-api-test.up.railway.app
-
-**Swagger UI:** https://fintrack-api-test.up.railway.app/docs
-
 ## 🛠 Tech Stack
 - **FastAPI** — Modern Python web framework
 - **PostgreSQL** — Database (hosted on Railway)
